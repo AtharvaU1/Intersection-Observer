@@ -1,18 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 
 const InfiniteScroll = (props) => {
-  const { data, renderList, handlePageIncrease, isLoading } = props;
+  const { data, renderList, handleIntersectionEvent, isLoading } = props;
 
   const observerRef = useRef(null);
   const lastNodeRef = (node) => {
-    console.log({ node });
     if (isLoading) return;
     if (observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
-      console.log(`entries: ${entries}`);
       if (!entries[0].isIntersecting) return;
-      handlePageIncrease();
+      handleIntersectionEvent();
     });
     if (node) observerRef.current.observe(node);
   };

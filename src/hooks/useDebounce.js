@@ -1,24 +1,15 @@
-import React, {
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import useDependenciesDebugger from "./useDependenciesDebugger";
+import { useCallback, useEffect, useRef } from "react";
 
 const useDebounce = (delay = 500, callback) => {
-  const [time, setTime] = useState(Date.now());
   const timeoutId = useRef(null);
 
   const debouncedFn = useCallback(
     function (...args) {
-      // put this inside useEffect!!
       timeoutId.current = setTimeout(() => {
         callback(...args);
       }, delay);
     },
-    [callback, delay, time]
+    [callback, delay]
   );
 
   useEffect(() => {
@@ -26,8 +17,7 @@ const useDebounce = (delay = 500, callback) => {
       if (!timeoutId) return;
       clearTimeout(timeoutId.current);
     };
-  }, [callback, delay, time]);
-  //useDependenciesDebugger({ callback, delay, time });
+  }, [callback, delay]);
 
   return debouncedFn;
 };

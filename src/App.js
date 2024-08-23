@@ -2,14 +2,12 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import "./App.css";
 import useDebounce from "./hooks/useDebounce";
 import InfiniteScroll from "./InfiniteScroll";
-import useDependenciesDebugger from "./hooks/useDependenciesDebugger";
 
 const endpoint = "https://openlibrary.org/search.json";
 
 async function getData(query, pageNumber, abortControllerRef) {
   const params = getUrlSearchParams(query, pageNumber);
   const url = new URL(`${endpoint}?${params}`);
-  console.log(url);
   abortControllerRef.current?.abort();
   abortControllerRef.current = new AbortController();
   const response = await fetch(url.href, {
@@ -21,7 +19,6 @@ async function getData(query, pageNumber, abortControllerRef) {
 
 const getUrlSearchParams = (query, pageNumber) => {
   const params = new URLSearchParams({ q: query, page: pageNumber, limit: 10 });
-  console.log(params);
   return params;
 };
 
@@ -30,7 +27,6 @@ function App() {
   const [query, setQuery] = useState("hello there");
   const [docs, setDocs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  //const isLoading = useRef(false);
   const AbortControllerRef = useRef(null);
 
   const fetchData = useCallback(
@@ -39,11 +35,9 @@ function App() {
       try {
         data = await getData(query, pageNumber, AbortControllerRef);
       } catch (error) {
-        console.log(error);
         setIsLoading(false);
         return;
       }
-      console.log(data);
       setDocs((curDocs) => [...curDocs, ...data.docs.slice(0, 10)]);
       setIsLoading(false);
     },
@@ -66,7 +60,7 @@ function App() {
 
   const handleInputChange = (event) => {
     if (!event || !event.target) {
-      console.log(`invalid event: ${event}`);
+      console.error(`invalid event: ${event}`);
       return;
     }
     setQuery(event.target.value);
@@ -89,10 +83,8 @@ function App() {
       <InfiniteScroll
         data={docs}
         renderList={renderDocs}
-        fetchData={fetchData}
         isLoading={isLoading}
-        handlePageIncrease={handlePageIncrease}
-        pageNumber={pageNumber}
+        handleIntersectionEvent={handlePageIncrease}
       />
     </>
   );
